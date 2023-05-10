@@ -88,6 +88,20 @@ class ResBlock(nn.Module):
 
         return res
 
+# The __init__ method defines the model architecture, with various hyperparameters that can be passed as arguments. Some key elements of the architecture include:
+
+# n_resblock: number of residual blocks in the model.
+# n_feats: number of feature maps in the model.
+# kernel_size: size of the convolutional kernel used in the model.
+# scale: factor by which to increase the resolution of the input image.
+# act: activation function used in the model.
+    
+# The forward method defines the forward pass of the model. The input x is first passed through the head module, which applies a convolutional layer to the input. 
+# The output of the head module is then passed through the body module, which consists of multiple ResBlock modules (residual blocks) that learn to 
+# extract features from the input image. The output of the body module is added to the input x, which forms the residual connection in the model.
+# The resulting tensor is then passed through the tail module, which upsamples the image using the Upsampler module and applies a final convolutional
+# layer to generate the output image.
+    
 class EDSR(nn.Module):
     def __init__(self, num_channels=3,input_channel=64, factor=4, width=64, depth=16, kernel_size=3, conv=default_conv):
         super(EDSR, self).__init__()
