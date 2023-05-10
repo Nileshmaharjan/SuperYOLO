@@ -11,6 +11,13 @@ def default_conv(in_channels, out_channels, kernel_size, bias=True):
         in_channels, out_channels, kernel_size,
         padding=(kernel_size//2), bias=bias)
 
+# The Upsampler class inherits from nn.Sequential and is used to upscale an input image by a specified scale 
+# factor using pixel shuffling. The __init__ method initializes a list of modules m that will be sequentially applied to the input tensor.
+# If the specified scale factor is a power of 2, the method appends a sequence of convolutional layers and pixel shuffling operations to m
+# that increase the number of channels by a factor of 4 at each step. If the scale factor is 3, the method appends a different set of convolutional 
+# and pixel shuffling layers that increase the number of channels by a factor of 9. If the scale factor is neither a power of 2 nor 3, an error is raised.
+
+
 class Upsampler(nn.Sequential):
     def __init__(self, conv, scale, n_feat, bn=False, act=False, bias=True):
 
@@ -31,6 +38,20 @@ class Upsampler(nn.Sequential):
 
         super(Upsampler, self).__init__(*m)
 
+# This code block defines a PyTorch module ResBlock that implements a residual block, which is commonly used in deep learning models for image processing tasks.
+# A residual block consists of two convolutional layers with the same number of input and output channels, and a skip connection that adds the input tensor to the 
+# output of the residual block.
+
+# The __init__ method initializes a list of PyTorch modules m that are used to define the residual block. The input arguments to this method are as follows:
+
+# conv: a convolutional layer that will be used to define the two convolutional layers in the residual block.
+# n_feat: an integer specifying the number of input and output channels in the convolutional layers.
+# kernel_size: an integer specifying the size of the kernel in the convolutional layers.
+# bias: a boolean indicating whether or not to include bias terms in the convolutional layers.
+# bn: a boolean indicating whether or not to use batch normalization after each convolutional layer.
+# act: an activation function that will be applied after the first convolutional layer.
+# res_scale: a scaling factor that is multiplied with the output of the residual block before it is added to the input tensor.
+        
 class ResBlock(nn.Module):
     def __init__(
         self, conv, n_feat, kernel_size,
@@ -45,6 +66,21 @@ class ResBlock(nn.Module):
 
         self.body = nn.Sequential(*m)
         self.res_scale = res_scale
+        
+        
+#         The forward() method takes an input tensor x and applies the residual block to it. The method first passes x through the body of the residual block,
+#         which consists of the two convolutional layers and the activation function if bn is True. The output of body is then multiplied by res_scale and added to
+#         the input tensor x. The resulting tensor is returned as the output of the residual block.
+
+# In the ResBlock module's forward() method, mul() is used to scale the output of the residual block by the res_scale factor before adding it to the input tensor x.
+
+# For example, if res_scale is set to 0.1 and the output of the residual block is a tensor res, then res.mul(res_scale) 
+# will multiply each element of res by 0.1. 
+# The resulting tensor will be the same size as res but with each element scaled down by a factor of 0.1.
+
+# By scaling the output of the residual block before adding it to the input tensor, the res_scale factor controls the strength 
+# of the residual connection in the overall model.
+# A higher res_scale value results in a stronger residual connection, whereas a lower value results in a weaker connection
 
     def forward(self, x):
         res = self.body(x).mul(self.res_scale)
